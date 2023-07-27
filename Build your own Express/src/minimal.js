@@ -1,34 +1,30 @@
-const http = require("http");
+const fs = require('fs');
+const path = require('path')
+const http = require('http')
 
-const fs = require("fs");
-const path = require("path");
+const request = require('./request');
+const response = require('./response');
 
-function Minimal() {
-  function listen(port = 8080, cb) {
-    return http
-      .createServer((req, res) => {
-        fs.readFile(
-          path.resolve(__dirname, "public", "index.html"),
-          (err, data) => {
-            res.setHeader("Content-Type", "text/html");
-            if (err) {
-              res.writeHead(500);
-              return res.end("Some error occured");
-            }
-            res.writeHead(200);
-            return res.end(data);
-          }
-        );
-      })
-      .listen({ port }, () => {
-        if (cb) {
-          if (typeof cb === "function") {
-            return cb();
-          }
-          throw new Error("Listen callback needs to be a function");
+function Minimal () {
+  function listen(PORT=8080, cb) {
+    return http.createServer((req,res)=>{
+      request(req);
+      response(res);
+      fs.readFile(path.resolve(__dirname, '../public', 'index.html'), (err, data) => {
+        if (err){
+          return res.status(500).send("Error Occured")
         }
-      });
+        return res.status(200).send(data);
+      })
+    }).listen(PORT, ()=>{
+      if (cb){
+        if (typeof cb === 'function'){
+          return cb();
+        } throw new Error('Listen callback needs to be a function')
+      }
+    })
   }
+  return {listen};
 }
 
 module.exports = Minimal;
