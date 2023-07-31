@@ -7,7 +7,7 @@ function response(res){
     }
     res.status = (code) => {
         res.statusCode = code || res.statusCode;
-        return end(content);
+        return res;
     }
     res.send = (content) => {
         res.setHeader("Content-Type", "text/html");
